@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    {% block title %}
+    {% endblock %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'spectre/spectre.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'spectre/spectre-exp.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'spectre/spectre-icons.min.css' %}">
+</head>
+<body class="">
+    <style type="text/css">
+        a {
+            text-decoration: none !important;
+            color: #333;
+        }
+
+        .mt-10px {
+            margin-top: 10px;
+        }
+
+        #play-speed li {
+            color: #333;
+        }
+    </style>
+
+    <div class="navbar bg-dark">
+        <section class="navbar-section">
+            <a href="{% url 'index' %}" class="btn btn-link mr-2 text-light">meduza.mp3</a>
+        </section>
+        <section class="navbar-section">
+            <span id="now-playing"></span>
+        </section>
+        <section class="navbar-section">
+            <button id="play-btn" class="btn btn-sm bg-dark" style="border-color: #eef0f3;margin-right:5px"><i class="icon icon-arrow-right"></i></button>
+            <div class="dropdown" style="border: .05rem solid #eef0f3; border-radius: .1rem;margin-right:15px" title="Скорость воспроизведения">
+                <a href="#" class="btn btn-sm dropdown-toggle bg-dark" tabindex="0" style="border:none">
+                    <i class="icon icon-caret"></i>
+                </a>     
+                <ul id="play-speed" class="menu">
+                    <li class="menu-item">
+                        <a href="">1x</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="">1.25x</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="">1.5x</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="">1.75x</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="">2x</a>
+                    </li>
+                </ul>                             
+            </div>
+            <audio id="meduza-mp3" hidden></audio>
+            <div id="slidebar" class="bar bar-slider" style="height:.25em;">
+                <div id="slidepointer" class="bar-item" role="progressbar" style="width:0%;">
+                    <button class="bar-slider-btn btn" role="slider"></button>
+                </div>
+            </div>
+        </section>
+    </div>  
+    <div class="container mt-10px">
+        <div class="columns">
+            <div class="column col-1"></div>
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="{% static 'player/player.js' %}"></script>
+<script type="text/javascript">
+const meduzaPlayer = new MPlayer({
+    audio: document.getElementById('meduza-mp3'),
+    slider: document.getElementById('slidepointer'),
+    slidebar: document.getElementById('slidebar'),
+    playSpeedMenu: document.getElementById('play-speed'),
+    btn: document.getElementById('play-btn'),
+});
+</script>
+{% block script %}
+{% endblock %}
+</html>

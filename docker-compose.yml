@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  web:
+    build: 
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/meduza_proj
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+  celery_worker:
+    build: 
+      context: .
+    volumes:
+      - .:/meduza_proj
+    command: 'celery -A meduza worker -l INFO'
+    depends_on: 
+      - redis
+      - web
+  celery_beat:
+    build: 
+      context: .
+    volumes:
+      - .:/meduza_proj
+    command: 'celery -A meduza beat -l INFO'
+    depends_on: 
+      - redis
+      - web
+

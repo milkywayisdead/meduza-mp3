@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>meduza.mp3</title>
+{% endblock %}
+
+{% block content %}
+<div id="records" class="column col-6"></div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', _ => {
+    let pageCounter = 0;
+
+    fetch('{% url "get_records" %}')
+        .then(response => response.json())
+        .then(data => {
+            for(let d of data){
+                const record = newRecord(d);
+                document.getElementById('records').append(record);
+            }
+
+            pageCounter += 1;
+        });
+
+    const player = meduzaPlayer;
+
+    const newRecord = (data) => {
+        const record = document.createElement('p');
+        const aRecord = document.createElement('a');
+        aRecord.innerText = `${data.datetime_msk} ${data.title}`;
+        aRecord.setAttribute('href', 'record/' + data.id);
+        record.append(aRecord);
+
+        if(data.sound){
+            const src = '{{ MEDIA_URL }}' + data.sound;
+            const p = document.createElement('button');
+            p.classList.add('btn', 'btn-action', 's-circle', 'btn-sm');
+            const i = document.createElement('i');
+            i.classList.add('icon', 'icon-arrow-right');
+            p.append(i);
+
+            p.addEventListener('click', (e) => {
+                if(e.target.tagName === 'I'){
+                    target = e.target.parentElement;
+                } else {
+                    target = e.target;
+                }
+
+                let _state = player.isPlaying();console.log(player.isPlaying())
+                
+                if(player.btnSecondary !== target){
+                    if(player.isPlaying()){
+                        player.toggleSecondary();
+                    }
+                    player.btnSecondary = target;                            
+                }   
+                player.toggleSecondary();
+
+                if(player.currentSrc === src){
+                    if(player.isPlaying()){
+                        player.pause(); 
+                    } else {
+                        player.play();
+                    }
+                } else {
+                    player.changeTrack(src);
+                    player.play();
+                }
+
+                if(_state != player.isPlaying()){
+                    player.toggleBtn(player.btn);
+                }
+
+                player.nowPlaying = data.title;
+            });
+
+            record.append(p);
+        }
+
+        return record;
+    }
+
+    window.onscroll = (e) => {
+        if(window.innerHeight + Math.ceil(window.pageYOffset) >= document.body.offsetHeight){
+            fetch('{% url "get_records" %}' + `?page=${pageCounter}`)
+                .then(response => response.json())
+                .then(data => {
+                    for(let d of data){
+                        const record = newRecord(d);
+                        document.getElementById('records').append(record);
+                    }
+
+                    pageCounter += 1;
+                });
+        }
+    }
+});
+</script>
+{% endblock %}
